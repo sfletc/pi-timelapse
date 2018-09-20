@@ -37,3 +37,12 @@ white_balance: { }
 
 # Rotate the images taken by the camera. Possible value are 0, 90, 180 or 270
 rotation: 0
+
+#start hour
+start_hour: 6
+
+#finish_hour
+end_hour: 17
+
+#path to usb
+path_to_storage: "/media/pi/USB"
