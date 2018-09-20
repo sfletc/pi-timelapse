@@ -7,6 +7,7 @@ from datetime import datetime
 from time import sleep
 import yaml
 
+sleep(30) #Allows external USB to be mounted properly before writing
 config = yaml.safe_load(open(os.path.join(sys.path[0], "config.yml")))
 image_number = 0
 
@@ -63,15 +64,17 @@ def capture_image():
             thread = threading.Timer(config['interval'], capture_image).start()
 
         # Start up the camera.
-        camera = PiCamera()
-        set_camera_options(camera)
+        now = datetime.now()
+        if config['start_hour'] < now.hour < config['end_hour']:
+            camera = PiCamera()
+            set_camera_options(camera)
 
-        # Capture a picture.
-        camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
-        camera.close()
+            # Capture a picture.
+            camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
+            camera.close()
 
-        if (image_number < (config['total_images'] - 1)):
-            image_number += 1
+            if (image_number < (config['total_images'] - 1)):
+                image_number += 1
         else:
             print '\nTime-lapse capture complete!\n'
             # TODO: This doesn't pop user into the except block below :(.
@@ -82,7 +85,7 @@ def capture_image():
 
 # Create directory based on current timestamp.
 dir = os.path.join(
-    sys.path[0],
+    config['path_to_storage'],
     'series-' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 )
 create_timestamped_dir(dir)
