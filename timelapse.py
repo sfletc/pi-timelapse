@@ -60,21 +60,18 @@ def capture_image():
 
         # Set a timer to take another picture at the proper interval after this
         # picture is taken.
-        if (image_number < (config['total_images'] - 1)):
-            thread = threading.Timer(config['interval'], capture_image).start()
-
-        # Start up the camera.
         now = datetime.now()
-        if config['start_hour'] < now.hour < config['end_hour']:
-            camera = PiCamera()
-            set_camera_options(camera)
+        if image_number < (config['total_images'] - 1) and config['start_hour'] < now.hour < config['end_hour']:
+            thread = threading.Timer(config['interval'], capture_image).start()
+        camera = PiCamera()
+        set_camera_options(camera)
 
-            # Capture a picture.
-            camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
-            camera.close()
+        # Capture a picture.
+        camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
+        camera.close()
 
-            if (image_number < (config['total_images'] - 1)):
-                image_number += 1
+        if (image_number < (config['total_images'] - 1)):
+            image_number += 1
         else:
             print '\nTime-lapse capture complete!\n'
             # TODO: This doesn't pop user into the except block below :(.
