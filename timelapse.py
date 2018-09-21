@@ -56,26 +56,18 @@ def set_camera_options(camera):
 
 def capture_image():
     try:
-        global image_number
 
         # Set a timer to take another picture at the proper interval after this
         # picture is taken.
         now = datetime.now()
-        if image_number < (config['total_images'] - 1) and config['start_hour'] < now.hour < config['end_hour']:
-            thread = threading.Timer(config['interval'], capture_image).start()
-        camera = PiCamera()
-        set_camera_options(camera)
+        if config['start_hour'] < now.hour < config['end_hour']:
+            camera = PiCamera()
+            set_camera_options(camera)
 
-        # Capture a picture.
-        camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
-        camera.close()
-
-        if (image_number < (config['total_images'] - 1)):
-            image_number += 1
-        else:
-            print '\nTime-lapse capture complete!\n'
-            # TODO: This doesn't pop user into the except block below :(.
-            sys.exit()
+            # Capture a picture.
+            camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
+            camera.close()
+        sleep(config['interval']) #Rough but simple
 
     except KeyboardInterrupt, SystemExit:
         print '\nTime-lapse capture cancelled.\n'
@@ -88,15 +80,16 @@ dir = os.path.join(
 create_timestamped_dir(dir)
 
 # Kick off the capture process.
-capture_image()
+while True:
+    capture_image()
 
 # TODO: These may not get called after the end of the threading process...
 # Create an animated gif (Requires ImageMagick).
-if config['create_gif']:
-    print '\nCreating animated gif.\n'
-    os.system('convert -delay 10 -loop 0 ' + dir + '/image*.jpg ' + dir + '-timelapse.gif')  # noqa
+# if config['create_gif']:
+#     print '\nCreating animated gif.\n'
+#     os.system('convert -delay 10 -loop 0 ' + dir + '/image*.jpg ' + dir + '-timelapse.gif')  # noqa
 
-# Create a video (Requires avconv - which is basically ffmpeg).
-if config['create_video']:
-    print '\nCreating video.\n'
-    os.system('avconv -framerate 20 -i ' + dir + '/image%05d.jpg -vf format=yuv420p ' + dir + '/timelapse.mp4')  # noqa
+# # Create a video (Requires avconv - which is basically ffmpeg).
+# if config['create_video']:
+#     print '\nCreating video.\n'
+#     os.system('avconv -framerate 20 -i ' + dir + '/image%05d.jpg -vf format=yuv420p ' + dir + '/timelapse.mp4')  # noqa
