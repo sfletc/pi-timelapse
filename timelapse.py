@@ -56,7 +56,7 @@ def set_camera_options(camera):
 
 def capture_image():
     try:
-
+        global image_number
         # Set a timer to take another picture at the proper interval after this
         # picture is taken.
         now = datetime.now()
@@ -67,6 +67,7 @@ def capture_image():
             # Capture a picture.
             camera.capture(dir + '/image{0:05d}.jpg'.format(image_number))
             camera.close()
+            image_number += 1
         sleep(config['interval']) #Rough but simple
 
     except KeyboardInterrupt, SystemExit:
